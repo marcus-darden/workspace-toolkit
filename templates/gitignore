@@ -1,0 +1,13 @@
+# Repo-backed sections (managed by workspace.yaml / /sync — not tracked by the workspace repo)
+# One line per section, e.g.:
+# /course/
+# /website/
+# /projects/
+
+# Instance clones (any templates/ scaffold stays tracked)
+/instance/*/
+
+# OS
+.DS_Store
+.DS_Store?
+._*

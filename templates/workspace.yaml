@@ -1,0 +1,57 @@
+# Workspace manifest. The presence of this file marks the workspace root.
+# Schema and conventions: workspace-toolkit docs/SPEC.md
+#
+# `sections` declares how content is stored in this workspace.
+# The section key is the local directory name (role-based, not the repo name).
+#   name:            — GitHub repo name when it differs from the section key.
+#   org:             — overrides the top-level org for a section or folder entry.
+#                      Resolution order: entry.org → section.org → top-level org.
+#   folder: true     — section contains multiple GitHub repos, each listed under `repos:`,
+#                      cloned to <key>/<entry-name>/.
+#   local: true      — no GitHub repo; a plain local directory. /sync reports [local].
+#   instanced: true  — per-iteration repos cloned to <key>/<slug>/.
+#                      Create new ones with /new-instance <slug>.
+#   status: archived — skipped by /sync and staleness audits by default; load on
+#                      request with /sync <section> (or /sync <section>/<slug>).
+#   optional: true   — skipped by /sync by default; load on request. Use for repos
+#                      not everyone needs.
+#
+# `tools` registers tools that own state in this workspace. Generic commands
+# never hand-edit or stage anything under a tool's `dir` or `owned` globs.
+
+version: 1
+
+org: {{ORG}}
+
+# tools:
+#   mytool:
+#     dir: mytool
+#     owned:
+#       - "**/.mytool/"
+
+sections:
+  {{SECTION_KEY}}:
+    role: {{ROLE}}
+    description: {{DESCRIPTION}}
+
+  # website:
+  #   name: myproject.org         # GitHub repo name differs from dir
+  #   role: website
+  #   description: Public website.
+
+  # projects:
+  #   folder: true                # multiple repos → projects/<name>/
+  #   repos:
+  #     - name: p1-example
+  #       description: "P1 — Example"
+
+  # scratch:
+  #   local: true                 # plain local directory, no GitHub repo
+  #   description: Local scratch space.
+
+  # instance:
+  #   instanced: true             # per-iteration repos → instance/<slug>/
+  #   repo: "{{PREFIX}}-{slug}"   # GitHub repo name template
+  #   description: "{slug} instance."
+  #   scaffold: templates/instance
+  #   instances: []
