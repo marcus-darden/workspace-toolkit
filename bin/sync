@@ -1,0 +1,113 @@
+#!/usr/bin/env python3
+"""Clone missing subrepos and refresh existing ones, per workspace.yaml.
+
+Usage:
+  bin/sync                     # all sections except archived/optional ones
+  bin/sync <section>           # that section, even if archived/optional
+  bin/sync <section>/<slug>    # one instance of an instanced section
+  bin/sync --dry-run           # print what would happen, do nothing
+  bin/sync <section> --dry-run
+
+Existing clones are fetched and reported, never pulled — pulling is your
+call once you have seen the state. Repos needing attention (dirty tree,
+ahead of upstream, detached HEAD) are listed at the end.
+"""
+import argparse
+import importlib.machinery
+import importlib.util
+import pathlib
+import sys
+
+_here = pathlib.Path(__file__).resolve().parent
+_spec = importlib.util.spec_from_loader(
+    "ws", importlib.machinery.SourceFileLoader("ws", str(_here / "_workspace.py")))
+ws = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(ws)
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("section", nargs="?",
+                    help="section key (or section/slug) to sync regardless of flags")
+    ap.add_argument("--dry-run", action="store_true",
+                    help="print what would be cloned or fetched; do nothing")
+    args = ap.parse_args()
+
+    manifest = ws.load_manifest()
+    work = list(ws.items(manifest))
+
+    if args.section:
+        target = args.section.rstrip("/")
+        work = [i for i in work
+                if i.section == target or i.section.startswith(target + "/")]
+        if not work:
+            ws.die(f"no section {target!r} in workspace.yaml")
+        for i in work:
+            i.skip_reason = None  # naming a section overrides its skip flags
+
+    rows, attention, counts = [], [], {}
+
+    def bump(key):
+        counts[key] = counts.get(key, 0) + 1
+
+    for item in work:
+        path = ws.ROOT / item.path
+
+        if item.skip_reason:
+            rows.append([f"[skipped]", item.path,
+                         f"({item.skip_reason} — run bin/sync {item.section} to load)"])
+            bump("skipped")
+            continue
+
+        if item.kind == "local":
+            state = "local section — not a GitHub repo" if path.is_dir() \
+                else "local section — directory missing"
+            rows.append(["[local]", item.path, f"({state})"])
+            bump("local")
+            continue
+
+        if not path.is_dir():
+            if args.dry_run:
+                rows.append(["[would-clone]", item.path, f"{item.org}/{item.repo}"])
+                bump("would-clone")
+                continue
+            else:
+                r = ws.git(ws.ROOT, "clone", "--quiet", item.clone_url, item.path)
+                if r.returncode != 0:
+                    rows.append(["[FAILED]", item.path, r.stderr.strip().splitlines()[-1]])
+                    attention.append((item.path, "clone failed — check access and repo name"))
+                    continue
+                rows.append(["[cloned]", item.path, f"{item.org}/{item.repo}"])
+            bump("cloned")
+            continue
+
+        if not (path / ".git").is_dir():
+            rows.append(["[no-git]", item.path, "(directory exists but is not a clone)"])
+            bump("no-git")
+            continue
+
+        if args.dry_run:
+            rows.append(["[would-fetch]", item.path, ""])
+            bump("would-fetch")
+            continue
+
+        ws.git(path, "fetch", "--quiet")
+        st = ws.repo_state(path)
+        dirty = "dirty" if (st["modified"] or st["untracked"]) else "clean"
+        mark = "  ⚠" if st["flags"] else ""
+        rows.append(["[ok]", item.path, f'{st["branch"]}  {dirty}  {st["delta"]}{mark}'])
+        bump("ok")
+        for f in st["flags"]:
+            attention.append((item.path, f))
+
+    ws.print_table(rows)
+    if attention:
+        print("\n⚠ Needs attention:")
+        for path, flag in attention:
+            print(f"  {path}  {flag}")
+    print("\n" + ", ".join(f"{v} {k}" for k, v in counts.items() if v)
+          + (f", {len(attention)} need-attention" if attention else ""))
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+"""Compact git status across the workspace repo and all subrepos.
+
+Usage:
+  bin/status
+
+One line per repo: the workspace root first, then every cloned repo
+declared in workspace.yaml. Read-only and network-free — nothing is
+fetched, cloned, or written, so "up-to-date" means up to date with the
+last fetch. Flags (uncommitted work, ahead of upstream, non-default
+branch) are listed at the end; fixing them is your call.
+"""
+import importlib.machinery
+import importlib.util
+import pathlib
+
+_here = pathlib.Path(__file__).resolve().parent
+_spec = importlib.util.spec_from_loader(
+    "ws", importlib.machinery.SourceFileLoader("ws", str(_here / "_workspace.py")))
+ws = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(ws)
+
+
+def main():
+    manifest = ws.load_manifest()
+    targets = [(".", ws.ROOT)]
+    for item in ws.items(manifest):
+        path = ws.ROOT / item.path
+        if item.kind == "repo" and (path / ".git").is_dir():
+            targets.append((item.path, path))
+
+    rows, flagged = [], []
+    for label, path in targets:
+        st = ws.repo_state(path)
+        if st is None:
+            continue
+        work = []
+        if st["modified"]:
+            work.append(f'{st["modified"]} modified')
+        if st["untracked"]:
+            work.append(f'{st["untracked"]} untracked')
+        rows.append([label, st["branch"], st["delta"], ", ".join(work) or "clean"])
+        for f in st["flags"]:
+            flagged.append((label, f))
+
+    ws.print_table(rows)
+    if flagged:
+        print("\n⚠ Flags:")
+        for label, flag in flagged:
+            print(f"  {label}  {flag}")
+
+
+if __name__ == "__main__":
+    main()
