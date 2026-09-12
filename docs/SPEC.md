@@ -4,8 +4,10 @@ A **workspace** is a git repository that gathers and governs a family of related
 git repositories. The presence of `workspace.yaml` at a directory's root marks it
 as a workspace (the way `Cargo.toml` marks a Rust crate). Subrepos are cloned in
 place as child directories, gitignored by the workspace repo, and each keeps its
-own `.git` — the workspace repo tracks only its own orchestration files
-(`workspace.yaml`, `.claude/`, docs, templates, scripts, tool directories).
+own `.git`. The workspace repo tracks its own content: orchestration
+(`workspace.yaml`, `.claude/`, `bin/`, docs, templates, tool directories) and —
+when it makes sense — core content of its own. What defines a workspace is not
+emptiness but the manifest: it formalizes how multiple repos combine.
 
 Originally built for multi-repo college courses (course content, projects,
 website, per-semester student repos), but nothing in the convention is
@@ -81,24 +83,38 @@ inside every repo. The boundary:
   active-instance pointer, ingestion manifests) inside their owned paths —
   never at the workspace root.
 
+## Scripts (bin/)
+
+The mechanical operations are plain scripts, copied into each workspace's
+`bin/` so humans can run them without an agent. Requirements: `python3` with
+PyYAML (`pip3 install pyyaml`).
+
+| Script | Contract |
+|---|---|
+| `bin/sync` | Clone missing / fetch existing per workspace.yaml. Named-section and `--dry-run` arguments; naming a section overrides `optional`/`archived`. Never pulls, never writes a subrepo's files, never edits workspace.yaml. Ends with a needs-attention list (dirty, ahead, detached HEAD). |
+| `bin/status` | One-line git status per present repo, workspace root first. Read-only and network-free; flags uncommitted work, ahead-of-upstream, and non-default branches. Never clones or fetches. |
+| `bin/_workspace.py` | The reference workspace.yaml parser, shared by both so they cannot disagree. Generic by rule: nothing workspace-specific may enter it. |
+
 ## Commands
 
 Copied into each workspace's `.claude/commands/` (see the scaffolding skill).
 Every command is a **pure interpreter of workspace.yaml**: no repo-name
 prefixes, scaffold paths, tool names, or layout rules may be hardcoded.
+`/sync` and `/ws-status` delegate to the `bin/` scripts — one implementation
+for humans and agents.
 
 | Command | Contract |
 |---|---|
-| `/sync` | Clone missing / fetch existing per workspace.yaml. Never pulls, never writes files, never edits workspace.yaml. |
-| `/status` | One-line git status per present repo, root repo included. Read-only. |
+| `/sync` | Runs `bin/sync` and relays its output. |
+| `/ws-status` | Runs `bin/status` and relays its output. (Named `ws-status`: `/status` shadows a CLI built-in.) |
 | `/push` | Commit + push pending work everywhere. Explicit-path staging, secret skipping, rebase-on-conflict with abort. Skips tool-owned paths. |
 | `/audit` | Read-only health check: pending work, staleness, branch hygiene, drift between disk and workspace.yaml, instance consistency. Domain rules live in the workspace's own `docs/audit-checklist.md`, which /audit runs if present. |
 | `/new-instance <slug>` | Create the GitHub repo from `repo:` template + `scaffold:`, register the slug, clone into `<key>/<slug>/`. |
 
 ## Conventions
 
-- `.gitignore` in the workspace repo ignores every repo-backed section path and
-  `/instance/*/` (scaffold/templates stay tracked).
+- `.gitignore` in the workspace repo ignores every repo-backed section path,
+  `/instance/*/` (scaffold/templates stay tracked), and `__pycache__/`.
 - `CLAUDE.md` is a one-liner pointing at `AGENTS.md`; `AGENTS.md` is the
   workspace map (key files, commands, lifecycle, cross-cutting rules).
 - Domain knowledge (course plans, style guides, checklists) lives in the

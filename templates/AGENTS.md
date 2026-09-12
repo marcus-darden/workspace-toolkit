@@ -9,6 +9,7 @@ hosts orchestration state and clones every subrepo as a child directory.
 | File | Purpose |
 |------|---------|
 | `workspace.yaml` | Workspace manifest — sections, repos to clone, instances, tools. |
+| `bin/` | Human-runnable workspace scripts (`sync`, `status`); `/sync` and `/ws-status` delegate to them. |
 | `docs/` | Workspace-level planning and reference docs. |
 
 ## Commands
@@ -38,8 +39,9 @@ tools that need one keep it in their own owned directory.
 
 ## Cross-cutting rules
 
-1. **One git per subrepo.** Commits, branches, and remotes are per subrepo. This
-   workspace repo tracks only its own orchestration files.
+1. **One git per subrepo.** Commits, branches, and remotes are per subrepo. The
+   workspace repo tracks its own content (orchestration, and core content when
+   it makes sense) but never a subrepo's files.
 2. **Never hand-edit tool-owned paths** (see `tools:` in `workspace.yaml`).
    Tools write and commit their own state.
 3. **When adding a new section or repo**: update `workspace.yaml` and re-run `/sync`.

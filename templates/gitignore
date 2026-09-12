@@ -7,6 +7,9 @@
 # Instance clones (any templates/ scaffold stays tracked)
 /instance/*/
 
+# Python (bin/ scripts)
+__pycache__/
+
 # OS
 .DS_Store
 .DS_Store?

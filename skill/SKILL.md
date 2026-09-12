@@ -51,7 +51,8 @@ If ambiguous, ask.
    - Fill every `{{PLACEHOLDER}}` and replace the commented example sections
      with the interviewed sections. Add one `.gitignore` line per repo-backed
      section (`/<key>/`), keep `/instance/*/` if instanced.
-   - Copy `toolkit/commands/*.md` → `.claude/commands/`.
+   - Copy `toolkit/commands/*.md` → `.claude/commands/`, and `toolkit/bin/*`
+     → `bin/` (preserve the executable bits: `cp -p`).
    - Create `docs/`, and `templates/instance/` (with a starter README) if an
      instanced section wants a local scaffold.
 3. **Initialize**: `git init`, initial commit of the orchestration files only.
@@ -63,7 +64,8 @@ If ambiguous, ask.
 ## Update mode
 
 1. Read `VERSION` in the toolkit and compare each `toolkit/commands/*.md`
-   against the workspace's `.claude/commands/`:
+   against the workspace's `.claude/commands/`, and each `toolkit/bin/*`
+   against the workspace's `bin/` (same rules for both):
    - Missing in workspace → new command, will be added.
    - Identical → up to date, no action.
    - Different → show the user a per-file diff (`diff -u workspace toolkit`).
@@ -72,12 +74,13 @@ If ambiguous, ask.
    instead of being overwritten. Ask per file: overwrite from toolkit, keep
    local, or upstream local → toolkit. Never silently overwrite a locally
    modified file.
-3. Copy confirmed updates into `.claude/commands/`; if upstreaming, copy the
-   workspace file into the toolkit, bump `VERSION` (patch), and commit the
-   toolkit.
+3. Copy confirmed updates into `.claude/commands/` and `bin/` (preserve
+   executable bits); if upstreaming, copy the workspace file into the toolkit,
+   bump `VERSION` (patch), and commit the toolkit.
 4. If the workspace's `workspace.yaml` has a `version:` newer than what the
    toolkit's SPEC.md documents, warn — the toolkit clone is stale; suggest
    pulling it.
 5. **Never touch**: `workspace.yaml` content, section directories, tool-owned
-   paths, or workspace docs. Update mode only manages `.claude/commands/`.
+   paths, or workspace docs. Update mode only manages `.claude/commands/` and
+   `bin/`.
 6. Report: per-file action taken, plus the toolkit VERSION.

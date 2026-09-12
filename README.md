@@ -20,9 +20,10 @@ the convention is course-specific.
 
 ## Installation
 
-Requirements: [Claude Code](https://claude.com/claude-code), `git`, and the
+Requirements: [Claude Code](https://claude.com/claude-code), `git`, the
 [GitHub CLI](https://cli.github.com) (`gh`, used by `/new-instance` and the
-scaffolding skill).
+scaffolding skill), and `python3` with PyYAML (`pip3 install pyyaml`, used by
+the `bin/` scripts).
 
 1. **Clone the toolkit** (the skill looks in `~/Development` by default, or
    set `$WORKSPACE_TOOLKIT` to wherever you put it):
@@ -38,10 +39,11 @@ scaffolding skill).
    cp -R ~/Development/workspace-toolkit/skill ~/.claude/skills/workspace
    ```
 
-That's it. The commands themselves are *not* installed globally — they are
-copied into each workspace's `.claude/commands/` by the skill, so every
-workspace is self-contained and works for collaborators who have never heard
-of this toolkit.
+That's it. The commands and scripts are *not* installed globally — the skill
+copies commands into each workspace's `.claude/commands/` and the scripts into
+its `bin/`, so every workspace is self-contained and works for collaborators
+who have never heard of this toolkit — including ones who don't use an agent
+at all: `bin/sync` and `bin/status` run directly from a shell.
 
 ## Usage
 
@@ -62,8 +64,8 @@ Inside any workspace:
 
 | Command | What it does |
 |---|---|
-| `/sync` | Clone missing subrepos, fetch existing ones. Never pulls, never writes. `--dry-run` to preview; `/sync <section>` to include optional/archived ones. |
-| `/ws-status` | One-line git status per repo, workspace repo included. Read-only. |
+| `/sync` | Clone missing subrepos, fetch existing ones. Never pulls, never writes. `--dry-run` to preview; `/sync <section>` to include optional/archived ones. Delegates to `bin/sync`, which you can also run directly. |
+| `/ws-status` | One-line git status per repo, workspace repo included. Read-only. Delegates to `bin/status`, which you can also run directly. |
 | `/push` | Commit and push pending work across every repo. Explicit-path staging, secret skipping, rebase-on-conflict with abort. Skips tool-owned paths. |
 | `/audit` | Read-only health check: pending work, staleness, branch hygiene, drift between disk and manifest. Runs your `docs/audit-checklist.md` if present. |
 | `/new-instance <slug>` | Create the next iteration's repo on GitHub from your template, register it in `workspace.yaml`, clone into `instance/<slug>/`. |
@@ -81,9 +83,9 @@ can pick it up.
 
 ### Manual use (no skill)
 
-Copy `commands/*.md` into `<workspace>/.claude/commands/`, start from
-`templates/workspace.yaml`, and gitignore each section directory. The
-templates' `{{PLACEHOLDERS}}` mark what to fill in.
+Copy `commands/*.md` into `<workspace>/.claude/commands/` and `bin/` into
+`<workspace>/bin/`, start from `templates/workspace.yaml`, and gitignore each
+section directory. The templates' `{{PLACEHOLDERS}}` mark what to fill in.
 
 ## Repository layout
 
@@ -92,6 +94,7 @@ templates' `{{PLACEHOLDERS}}` mark what to fill in.
 | `docs/SPEC.md` | The workspace.yaml schema and conventions. |
 | `docs/PHILOSOPHY.md` | Design rationale and rules for tools/agents operating in workspaces. |
 | `commands/` | Canonical generic commands, copied into each workspace's `.claude/commands/`. |
+| `bin/` | The `sync`/`status` scripts and shared manifest parser, copied into each workspace's `bin/`. |
 | `templates/` | Skeletons for scaffolding: `workspace.yaml`, `AGENTS.md`, `README.md`, `CLAUDE.md`, `gitignore`. |
 | `skill/` | The Claude Code skill (`workspace`) — copy to `~/.claude/skills/workspace`. |
 | `VERSION` | Toolkit version, read by the skill's update mode. |
