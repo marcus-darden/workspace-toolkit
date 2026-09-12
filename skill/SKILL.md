@@ -1,6 +1,6 @@
 ---
 name: workspace
-description: Create or update a multi-repo "workspace" (a git repo with a workspace.yaml manifest that gathers and governs a family of repos). Use when the user wants to scaffold a new workspace for a course or major multi-repo project, or to refresh an existing workspace's generic commands (/sync /status /push /audit /new-instance) from the workspace-toolkit.
+description: Create or update a multi-repo "workspace" (a git repo with a workspace.yaml manifest that gathers and governs a family of repos). Use when the user wants to scaffold a new workspace for a course or major multi-repo project, or to refresh an existing workspace's generic commands (/sync /ws-status /push /audit /new-instance) from the workspace-toolkit.
 ---
 
 # Workspace — create or update

@@ -30,7 +30,7 @@ Everything in a workspace belongs to exactly one of three domains, and most of
 the design falls out of refusing to let them blur:
 
 1. **Generic orchestration** — the workspace convention itself: the
-   `workspace.yaml` schema, the commands (`/sync`, `/status`, `/push`,
+   `workspace.yaml` schema, the commands (`/sync`, `/ws-status`, `/push`,
    `/audit`, `/new-instance`), the instance model, the tool boundary. This is
    what the toolkit owns. It must contain no knowledge of any particular
    project.

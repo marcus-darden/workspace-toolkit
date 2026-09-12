@@ -63,7 +63,7 @@ Inside any workspace:
 | Command | What it does |
 |---|---|
 | `/sync` | Clone missing subrepos, fetch existing ones. Never pulls, never writes. `--dry-run` to preview; `/sync <section>` to include optional/archived ones. |
-| `/status` | One-line git status per repo, workspace repo included. Read-only. |
+| `/ws-status` | One-line git status per repo, workspace repo included. Read-only. |
 | `/push` | Commit and push pending work across every repo. Explicit-path staging, secret skipping, rebase-on-conflict with abort. Skips tool-owned paths. |
 | `/audit` | Read-only health check: pending work, staleness, branch hygiene, drift between disk and manifest. Runs your `docs/audit-checklist.md` if present. |
 | `/new-instance <slug>` | Create the next iteration's repo on GitHub from your template, register it in `workspace.yaml`, clone into `instance/<slug>/`. |

@@ -16,7 +16,7 @@ hosts orchestration state and clones every subrepo as a child directory.
 - `/sync` — clone or refresh every non-archived, non-optional repo-backed section in `workspace.yaml`.
 - `/sync <section>` — clone or refresh a specific section (or `instance/<slug>`), including archived or optional ones.
 - `/sync --dry-run` — preview what would be cloned or fetched without doing anything.
-- `/status` — one-line git status per repo (root repo included).
+- `/ws-status` — one-line git status per repo (root repo included).
 - `/push` — commit and push pending work across the root repo and all subrepos.
 - `/audit` — read-only health check: pending work, staleness, branch hygiene, drift.
 - `/new-instance <slug>` — create a new instance repo from the scaffold, register it in `workspace.yaml`, clone into `instance/<slug>/`.
