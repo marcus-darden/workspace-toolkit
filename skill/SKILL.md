@@ -45,7 +45,11 @@ If ambiguous, ask.
      `templates/instance/`), and any initial instance slugs.
    - Tools to register (default: none). For each: name → `dir:` = the name,
      plus any `owned:` globs.
-2. **Scaffold** the directory:
+2. **Scaffold** the directory. If it already has content (enabling an
+   existing repo as a workspace root), **never overwrite an existing file**:
+   add `workspace.yaml`, append the section lines to any existing
+   `.gitignore`, copy commands and `bin/` in, and for `AGENTS.md`/`README.md`
+   propose additions instead of replacing them. In an empty directory:
    - Copy `toolkit/templates/*` in: `workspace.yaml`, `AGENTS.md`, `README.md`,
      `CLAUDE.md`, and `gitignore` → `.gitignore`.
    - Fill every `{{PLACEHOLDER}}` and replace the commented example sections

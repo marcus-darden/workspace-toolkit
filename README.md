@@ -55,8 +55,26 @@ In Claude Code, in (or about) an empty directory:
 
 The skill interviews you (GitHub org, sections and their kinds, instance
 naming, tools), writes `workspace.yaml` + `AGENTS.md` + `.gitignore` from the
-templates, copies the five commands into `.claude/commands/`, and initializes
-git. Then run `/sync` to clone any repos that already exist.
+templates, copies the five commands into `.claude/commands/` and the scripts
+into `bin/`, and initializes git. Then run `/sync` to clone any repos that
+already exist.
+
+### Enable an existing repo as a workspace
+
+The toolkit is never cloned *into* a workspace — it lives once per machine,
+and what a workspace carries are **copies** of the transferable pieces. Any
+existing repo becomes a workspace root the moment it has:
+
+1. a `workspace.yaml` declaring its family of repos (start from
+   `templates/workspace.yaml`; schema in `docs/SPEC.md`),
+2. one `.gitignore` line per repo-backed section (`/<key>/`), plus
+   `__pycache__/`,
+3. `bin/` and `.claude/commands/` copied from the toolkit.
+
+Run the same skill prompt inside the repo — create mode detects existing
+content and adds around it, never overwriting files you already have. The
+repo's own content stays where it is: workspace roots may carry core content;
+the manifest just formalizes how the repos combine.
 
 ### Work day to day
 
