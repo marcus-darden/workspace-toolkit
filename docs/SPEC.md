@@ -114,7 +114,9 @@ for humans and agents.
 ## Conventions
 
 - `.gitignore` in the workspace repo ignores every repo-backed section path,
-  `/instance/*/` (scaffold/templates stay tracked), and `__pycache__/`.
+  `/instance/*` with `!/instance/*.md` (scaffold notes stay tracked; no
+  trailing slash, or a symlink at that path escapes the rule), and
+  `__pycache__/`.
 - `CLAUDE.md` is a one-liner pointing at `AGENTS.md`; `AGENTS.md` is the
   workspace map (key files, commands, lifecycle, cross-cutting rules).
 - Domain knowledge (course plans, style guides, checklists) lives in the

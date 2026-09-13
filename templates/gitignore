@@ -4,8 +4,13 @@
 # /website/
 # /projects/
 
-# Instance clones (any templates/ scaffold stays tracked)
-/instance/*/
+# Instance clones. No trailing slash on purpose: with one, the rule matches
+# directories only, so a symlink at instance/<slug> is NOT ignored, and a
+# cloud session that leaves one behind can commit it. On the next checkout
+# git replaces the real clone with a dangling link. The negation keeps a
+# scaffold note directly in instance/ trackable.
+/instance/*
+!/instance/*.md
 
 # Python (bin/ scripts)
 __pycache__/
