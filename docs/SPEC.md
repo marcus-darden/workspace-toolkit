@@ -117,7 +117,7 @@ for humans and agents.
   `/instance/*` with `!/instance/*.md` (scaffold notes stay tracked; no
   trailing slash, or a symlink at that path escapes the rule), and
   `__pycache__/`.
-- `CLAUDE.md` is a one-liner pointing at `AGENTS.md`; `AGENTS.md` is the
-  workspace map (key files, commands, lifecycle, cross-cutting rules).
+- `CLAUDE.md` is a one-line `@AGENTS.md` import, so Claude Code loads
+  `AGENTS.md` every session; `AGENTS.md` is the workspace map (key files, commands, lifecycle, cross-cutting rules).
 - Domain knowledge (course plans, style guides, checklists) lives in the
   workspace's `docs/` and per-repo files — never in commands.
