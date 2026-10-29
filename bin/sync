@@ -107,7 +107,7 @@ def main():
         for path, flag in attention:
             print(f"  {path}  {flag}")
     print("\n" + ", ".join(f"{v} {k}" for k, v in counts.items() if v)
-          + (f", {len(attention)} need-attention" if attention else ""))
+          + (f", {len({p for p, _ in attention})} need-attention" if attention else ""))
 
 
 if __name__ == "__main__":
