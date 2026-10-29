@@ -106,6 +106,12 @@ def repo_state(path):
     if not out:
         return None
     header, body = out[0], out[1:]
+    # An unborn branch reads "## No commits yet on main..." ("Initial
+    # commit on" before git 2.15); drop the prefix to reach the name.
+    unborn = False
+    for prefix in ("## No commits yet on ", "## Initial commit on "):
+        if header.startswith(prefix):
+            header, unborn = "## " + header[len(prefix):], True
     branch = header[3:].split("...")[0].split(" ")[0]
     if "..." in header:
         if "[" in header:
@@ -127,6 +133,10 @@ def repo_state(path):
         flags.append("uncommitted work")
     if "ahead" in delta:
         flags.append("ahead of upstream")
+    if delta == "gone":
+        flags.append("upstream gone")
+    if unborn:
+        flags.append("no commits")
     if default and branch != default:
         flags.append(f"on {branch}, default is {default}")
     if branch.startswith("HEAD"):

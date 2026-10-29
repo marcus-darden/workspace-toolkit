@@ -91,7 +91,7 @@ PyYAML (`pip3 install pyyaml`).
 
 | Script | Contract |
 |---|---|
-| `bin/sync` | Clone missing / fetch existing per workspace.yaml. Named-section and `--dry-run` arguments; naming a section overrides `optional`/`archived`. Never pulls, never writes a subrepo's files, never edits workspace.yaml. Ends with a needs-attention list (dirty, ahead, detached HEAD). |
+| `bin/sync` | Clone missing / fetch existing per workspace.yaml. Named-section and `--dry-run` arguments; naming a section overrides `optional`/`archived`. Never pulls, never writes a subrepo's files, never edits workspace.yaml. Ends with a needs-attention list (dirty, ahead, detached HEAD, upstream gone, no commits). |
 | `bin/status` | One-line git status per present repo, workspace root first. Read-only and network-free; flags uncommitted work, ahead-of-upstream, and non-default branches. Never clones or fetches. |
 | `bin/_workspace.py` | The reference workspace.yaml parser, shared by both so they cannot disagree. Generic by rule: nothing workspace-specific may enter it. |
 

@@ -10,7 +10,8 @@ Usage:
 
 Existing clones are fetched and reported, never pulled — pulling is your
 call once you have seen the state. Repos needing attention (dirty tree,
-ahead of upstream, detached HEAD) are listed at the end.
+ahead of upstream, detached HEAD, upstream gone, no commits) are listed at
+the end.
 """
 import argparse
 import importlib.machinery
